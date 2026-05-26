@@ -3,4 +3,4 @@
 //
 //   window.BACKEND_URL = "https://no-ball-wide-ball.onrender.com";
 //
-window.BACKEND_URL = "";
+window.BACKEND_URL = "https://no-ball-wide-ball.onrender.com";
