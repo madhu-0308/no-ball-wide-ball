@@ -1,0 +1,32 @@
+# Keep the image small. We do not use these YOLOv8 weights at runtime
+# (only runs/detect/train5/weights/best.pt and yolov8n-pose.pt are used).
+yolov8l.pt
+yolov8m.pt
+yolov8s.pt
+yolov8n.pt
+
+# User-data dirs - persistent at runtime, not part of the image.
+uploads/
+outputs/
+calibrations/
+
+# Local dev artefacts.
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Git + IDE noise.
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Static-only Vercel frontend (deployed separately).
+web/
+
+# Local test artefacts and large videos that aren't needed at runtime.
+runs/wide_no_ball_*.mp4
+images/
+README.md

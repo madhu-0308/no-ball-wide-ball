@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cricket Wide / No-Ball Detector</title>
+  <link rel="stylesheet" href="./style.css" />
+  <!-- Edit web/config.js (or set window.BACKEND_URL before this loads)
+       to point at your Render backend. -->
+  <script src="./config.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Cricket Wide / No-Ball Detector</h1>
+    <p class="subtitle">
+      Upload a side-on broadcast clip, click the 4 crease intersections to
+      calibrate the pitch, then run detection.
+    </p>
+  </header>
+
+  <main>
+    <section class="card" id="step-upload">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        <h2>Upload a video</h2>
+      </div>
+      <form id="upload-form">
+        <label class="file-drop" for="file-input">
+          <input type="file" id="file-input" name="video"
+                 accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm" required />
+          <span class="file-drop-text">
+            <strong>Click to choose a video</strong>
+            <small>or drop an .mp4 / .mov here. Max 200 MB.</small>
+          </span>
+        </label>
+        <button class="primary" type="submit">Upload</button>
+      </form>
+      <p class="status" id="upload-status"></p>
+    </section>
+
+    <section class="card hidden" id="step-calibrate">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        <h2>Calibrate the pitch</h2>
+      </div>
+      <p>
+        Click the 4 crease intersections in this order. The active one is
+        highlighted below.
+      </p>
+      <ol class="instructions">
+        <li id="pt-1">Bowler-end popping crease &nbsp;&times;&nbsp; LEFT return crease</li>
+        <li id="pt-2">Bowler-end popping crease &nbsp;&times;&nbsp; RIGHT return crease</li>
+        <li id="pt-3">Batsman-end popping crease &nbsp;&times;&nbsp; RIGHT return crease</li>
+        <li id="pt-4">Batsman-end popping crease &nbsp;&times;&nbsp; LEFT return crease</li>
+      </ol>
+      <div class="canvas-wrap">
+        <canvas id="calib-canvas"></canvas>
+      </div>
+      <div class="actions">
+        <button id="calib-undo" class="ghost">Undo last point</button>
+        <button id="calib-reset" class="ghost">Reset</button>
+        <button id="calib-save" class="primary" disabled>Save calibration</button>
+      </div>
+      <p class="status" id="calib-status"></p>
+    </section>
+
+    <section class="card hidden" id="step-detect">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        <h2>Run detection</h2>
+      </div>
+      <p>
+        Pose estimation + ball tracking + pitch-aware umpire rules. This takes
+        a couple of minutes per clip on CPU.
+      </p>
+      <button class="primary" id="run-detect">Detect wides &amp; no-balls</button>
+      <div id="detect-progress" class="hidden">
+        <div class="spinner"></div>
+        <span>Running detection&hellip;</span>
+      </div>
+      <p class="status" id="detect-status"></p>
+    </section>
+
+    <section class="card hidden" id="step-results">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        <h2>Results</h2>
+      </div>
+      <div class="result-grid">
+        <div class="result-cell">
+          <h3>Annotated video</h3>
+          <video id="result-video" controls></video>
+        </div>
+        <div class="result-cell">
+          <h3>Summary</h3>
+          <div class="verdict-row">
+            <div class="verdict" id="verdict-wide">
+              <span class="verdict-label">WIDE</span>
+              <span class="verdict-value">&mdash;</span>
+            </div>
+            <div class="verdict" id="verdict-noball">
+              <span class="verdict-label">NO BALL</span>
+              <span class="verdict-value">&mdash;</span>
+            </div>
+          </div>
+          <table id="stats-table">
+            <tbody></tbody>
+          </table>
+          <button class="ghost" id="reset-all">Start over</button>
+        </div>
+      </div>
+    </section>
+
+    <p id="backend-banner" class="status warn" style="text-align:center;display:none">
+      No backend URL configured. Open <code>web/config.js</code> and set
+      <code>window.BACKEND_URL</code> to your Render URL.
+    </p>
+  </main>
+
+  <footer>
+    <small>
+      Powered by YOLOv8 + YOLOv8-Pose + OpenCV homography.
+      Rules: wide &harr; ball outside &plusmn;0.89&nbsp;m at batter's popping crease;
+      no-ball &harr; bowler's front foot past the popping crease.
+    </small>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

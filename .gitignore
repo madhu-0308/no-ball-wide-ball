@@ -1,2 +1,14 @@
 cricket_ball_data
 myenv
+
+# Local Python and dev artefacts
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Per-job runtime data (created by the Flask app at runtime, never commit)
+uploads/
+outputs/
+calibrations/

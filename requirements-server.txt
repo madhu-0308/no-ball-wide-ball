@@ -1,0 +1,18 @@
+# Slim runtime stack for the Flask wide / no-ball API.
+# CPU-only torch wheel + headless OpenCV keeps the Docker image well under
+# typical free-tier image-size limits.
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+flask==3.1.3
+flask-cors==5.0.0
+gunicorn==23.0.0
+
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+
+torch==2.4.1+cpu
+torchvision==0.19.1+cpu
+ultralytics==8.3.40
+
+requests==2.32.3

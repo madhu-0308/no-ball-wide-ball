@@ -26,6 +26,10 @@ import cv2
 import numpy as np
 from flask import (Flask, jsonify, render_template, request, send_from_directory,
                    url_for)
+try:
+    from flask_cors import CORS
+except ImportError:  # local dev without flask-cors installed
+    CORS = None
 
 from wide_no_ball_detector import (
     run_detection,
@@ -50,6 +54,13 @@ ALLOWED_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".webm"}
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_MB * 1024 * 1024
+
+# Allow the Vercel-hosted static frontend (and any other origin you set in
+# CORS_ALLOW_ORIGINS, comma-separated) to call this API.
+if CORS is not None:
+    _cors_origins = os.environ.get("CORS_ALLOW_ORIGINS", "*")
+    _origins = [o.strip() for o in _cors_origins.split(",") if o.strip()]
+    CORS(app, resources={r"/*": {"origins": _origins or "*"}})
 
 
 # --------------------------------------------------------------------------- #
