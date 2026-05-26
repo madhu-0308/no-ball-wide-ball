@@ -1,0 +1,13 @@
+{
+  "frames": 392,
+  "ball_detections": 212,
+  "bowler_detections": 0,
+  "wide": false,
+  "no_ball": false,
+  "video_size": [
+    720,
+    1280
+  ],
+  "fps": 30.0,
+  "output_url": "/outputs/331c88ad9959.mp4"
+}

@@ -76,6 +76,60 @@ Export the trained model to ONNX:
 python modelSave.py
 ```
 
+### Wide / No-Ball Detection
+`wide_no_ball_detector.py` extends the ball detector with pitch-aware
+umpiring logic. It uses:
+
+- the trained ball model in `runs/detect/train5/weights/best.pt`,
+- `yolov8n-pose.pt` (auto-downloaded by Ultralytics on first run) for the
+  bowler's pose / front foot,
+- an OpenCV 4-point homography from image pixels to real-world pitch
+  metres so popping creases, return creases and the wide line markers all
+  live in one consistent coordinate system.
+
+**1. Calibrate (one time per camera angle).** Click the four crease
+intersections in this order:
+1. Bowler-end popping crease  -  LEFT  return crease
+2. Bowler-end popping crease  -  RIGHT return crease
+3. Batsman-end popping crease -  RIGHT return crease
+4. Batsman-end popping crease -  LEFT  return crease
+
+```bash
+python wide_no_ball_detector.py --video videos/test1.mp4 --calibrate
+```
+
+This writes `crease_config.json`.
+
+**2. Run detection.**
+```bash
+python wide_no_ball_detector.py \
+    --video videos/test1.mp4 \
+    --calibration crease_config.json \
+    --output runs/wide_no_ball_test1.mp4
+```
+
+Add `--no-show` to run headless (CI / WSL / no display).  The annotated
+MP4 contains the pitch overlay, the ball trail, the bowler's front-foot
+indicator and a WIDE / NO BALL banner whenever the rules fire.
+
+**Rules used.**
+- *No ball*: the bowler's front-foot ankle, projected to pitch metres,
+  lands more than 15 cm past the bowler-end popping crease for at least
+  three consecutive frames.
+- *Wide*: the ball, projected to pitch metres, travels outside the
+  longitudinal +/- 0.89 m wide-line corridor while in flight toward the
+  batsman (`y > 0.4 * pitch length` and moving forward) for two or more
+  consecutive frames.
+
+**Known limitations.**
+- A single homography matches a single fixed broadcast shot.  When the
+  director cuts to a tighter angle, the pitch overlay no longer aligns
+  and the system can mis-identify people; recalibrate per shot for
+  serious use.
+- The no-ball check uses the ankle keypoint (not the heel).  Add a few
+  centimetres of tolerance via `py > 0.15` in the source if your camera
+  view systematically biases the projection.
+
 ---
 
 ## <a href="https://www.kaggle.com/datasets/kushagra3204/cricket-ball-dataset-for-yolo" target="_blank">Dataset</a>
